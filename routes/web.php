@@ -17,3 +17,5 @@ use App\Http\Controllers\WeatherController;
 Route::get('/', [WeatherController::class, 'index'])->name('index');
 
 Route::post('/', [WeatherController::class, 'getWeather'])->name('getWeather');
+
+Route::post('/save', [WeatherController::class, 'save'])->name('save');

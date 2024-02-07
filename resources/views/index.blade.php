@@ -2,6 +2,12 @@
 
 @section('content')
 <div class="container mt-5">
+  @if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+  @endif
+
   <form action="{{ route('getWeather') }}" method="POST">
     @csrf
     <div class="row">
@@ -14,7 +20,9 @@
       </div>
     </div>
   </form>
+
   <hr>
+
   @if(isset($weather))
   <div class="card">
     <div class="card-body">
@@ -26,7 +34,10 @@
       @else
         <h4 class="card-title">Period</h4>
         <span>Starts at: {{ $weather['list'][0]['dt_txt'] }}</span>
-        <form>
+        <form action="{{ route('save') }}" method="POST">
+          @csrf
+          <input type="hidden" name="cityName" value="{{ $weather['city_name'] }}">
+          <input type="hidden" name="source" value="{{ \App\Services\WeatherService::SOURCE_API }}">
           <button type="submit" class="btn btn-success">Save forecast</button>
         </form>
       @endif
@@ -53,6 +64,7 @@
     @endforeach
   </tbody>
 </table>
+
   @endif
 </div>
 @endsection
