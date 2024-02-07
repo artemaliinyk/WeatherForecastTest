@@ -19,9 +19,17 @@ class WeatherController extends Controller
         $this->weatherRepository = $weatherRepository;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return view('index');
+        $cityName = $request->query('cityName');
+        $source = $request->query('source');
+        $weather = null;
+
+        if ($cityName && $source) {
+            $weather = $this->weatherService->getWeatherByCity($cityName, $source);
+        }
+
+        return view('index', ['cityName' => $cityName, 'weather' => $weather]);
     }
 
     public function getWeather(Request $request)
@@ -31,7 +39,7 @@ class WeatherController extends Controller
 
         $weather = $this->weatherService->getWeatherByCity($cityName, $source);
 
-        return view('index', ['cityName' => $cityName, 'weather' => $weather]);
+        return redirect()->route('index', ['cityName' => $cityName, 'source' => $source]);
     }
 
     public function save(WeatherRequest $request)
@@ -42,7 +50,7 @@ class WeatherController extends Controller
             $weather = $this->weatherService->getWeatherByCity($validated['cityName'], $validated['source']);
             $this->weatherRepository->save($validated['cityName'], $weather);
 
-            return redirect()->back()->with('success', 'Forecast saved successfully!');
+            return redirect()->route('index', ['cityName' => $validated['cityName'], 'source' => $validated['source']])->with('success', 'Forecast saved successfully!');
         }
 
         return redirect()->back()->with('error', 'Invalid source.');
