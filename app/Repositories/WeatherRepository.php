@@ -6,21 +6,35 @@ use App\Models\Weather;
 
 class WeatherRepository
 {
-    public function save($cityName, $weatherData): void
+    /**
+     * Find weather data by city name.
+     *
+     * @param string $cityName The name of the city.
+     * @return Weather|null Weather model instance or null if not found.
+     */
+    public function findByCityName(string $cityName): ?Weather
     {
-        $weather = $weatherData['list'][0] ?? null;
+        return Weather::where('city_name', $cityName)->firstOrFail();
+    }
 
-        if (!$weather) {
-            return;
-        }
+    /**
+     * Save or update weather data for a given city.
+     *
+     * @param string $cityName The name of the city.
+     * @param array $data The weather data array.
+     * @return Weather The saved or updated Weather model instance.
+     */
+    public function save(string $cityName, array $data): Weather
+    {
+        $weatherData = $data['list'][0];
 
-        Weather::updateOrCreate(
+        return Weather::updateOrCreate(
             ['city_name' => $cityName],
             [
-                'min_tmp' => $weather['main']['temp_min'],
-                'max_tmp' => $weather['main']['temp_max'],
-                'wind_spd' => $weather['wind']['speed'],
-                'timestamp_dt' => $weather['dt_txt']
+                'min_tmp' => $weatherData['main']['temp_min'],
+                'max_tmp' => $weatherData['main']['temp_max'],
+                'wind_spd' => $weatherData['wind']['speed'],
+                'timestamp_dt' => $weatherData['dt_txt'],
             ]
         );
     }

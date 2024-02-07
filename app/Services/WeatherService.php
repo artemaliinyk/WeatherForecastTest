@@ -4,25 +4,39 @@ namespace App\Services;
 
 use App\Models\Weather;
 use Illuminate\Support\Facades\Http;
+use App\Repositories\WeatherRepository;
 
 class WeatherService
 {
     const SOURCE_API = 'API';
     const SOURCE_DB = 'DB';
 
-    public function getWeatherByCity($cityName, $source)
+    public function __construct(private WeatherRepository $weatherRepository) {}
+
+    /**
+     * Get weather by city name from the specified source.
+     *
+     * @param string $cityName Name of the city.
+     * @param string $source Source of the weather data (API or DB).
+     * @return array|null Weather data array or null if an invalid source is provided.
+     * @throws \InvalidArgumentException If the source is invalid.
+     */
+    public function getWeatherByCity(string $cityName, string $source): ?array
     {
-        switch ($source) {
-            case self::SOURCE_API:
-                return $this->getWeatherByCityFromApi($cityName);
-            case self::SOURCE_DB:
-                return $this->getWeatherByCityFromDb($cityName);
-            default:
-                throw new \InvalidArgumentException("Invalid source provided: $source");
-        }
+        return match ($source) {
+            self::SOURCE_API => $this->getWeatherByCityFromApi($cityName),
+            self::SOURCE_DB => $this->getWeatherByCityFromDb($cityName),
+            default => throw new \InvalidArgumentException("Invalid source provided: $source"),
+        };
     }
 
-    protected function getWeatherByCityFromApi($cityName)
+    /**
+     * Fetch weather for a city from an external API.
+     *
+     * @param string $cityName City name to fetch weather for.
+     * @return array Weather data from the API.
+     */
+    protected function getWeatherByCityFromApi(string $cityName): array
     {
         $response = Http::get(config('services.openweather.url'), [
             'q' => $cityName,
@@ -39,9 +53,15 @@ class WeatherService
         ];
     }
 
-    protected function getWeatherByCityFromDb($cityName)
+    /**
+     * Retrieve weather information for a city from the database.
+     *
+     * @param string $cityName Name of the city to retrieve weather for.
+     * @return array Weather data from the database.
+     */
+    protected function getWeatherByCityFromDb(string $cityName): array
     {
-        $weather = Weather::where('city_name', $cityName)->firstOrFail();
+        $weather = $this->weatherRepository->findByCityName($cityName);
 
         return [
             'type' => self::SOURCE_DB,
