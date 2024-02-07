@@ -6,9 +6,9 @@ use App\Models\Weather;
 
 class WeatherRepository
 {
-    public function saveWeather($cityName, $weatherData): void
+    public function save($cityName, $weatherData): void
     {
-        $weather = $weatherData['list1'][0] ?? null;
+        $weather = $weatherData['list'][0] ?? null;
 
         if (!$weather) {
             return;

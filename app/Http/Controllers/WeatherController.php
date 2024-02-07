@@ -40,7 +40,7 @@ class WeatherController extends Controller
 
         if ($validated['source'] === WeatherService::SOURCE_API) {
             $weather = $this->weatherService->getWeatherByCity($validated['cityName'], $validated['source']);
-            $this->weatherRepository->saveWeather($validated['cityName'], $weather);
+            $this->weatherRepository->save($validated['cityName'], $weather);
 
             return redirect()->back()->with('success', 'Forecast saved successfully!');
         }
