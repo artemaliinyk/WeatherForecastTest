@@ -9,6 +9,8 @@ class Weather extends Model
 {
     use HasFactory;
 
+    protected $dates = ['timestamp_dt'];
+
     protected $fillable = [
         'timestamp_dt',
         'city_name',

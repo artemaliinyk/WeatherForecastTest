@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('weather', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('timestamp_dt');
+            $table->timestamp('timestamp_dt');
             $table->string('city_name');
             $table->decimal('min_tmp', 8, 2);
             $table->decimal('max_tmp', 8, 2);
